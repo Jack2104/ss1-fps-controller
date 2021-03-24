@@ -2,8 +2,6 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    // Decreasing snappiness will decrease the time interval and thus the interpolation
-    // will occur faster, thus resulting in faster movement but less smoothing
     [SerializeField] float snappiness = 100f;
 
     private float xAccumulator;
