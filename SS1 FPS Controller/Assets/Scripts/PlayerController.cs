@@ -24,9 +24,13 @@ public class PlayerController : MonoBehaviour
         currentVerticalAngle = (currentVerticalAngle > 180) ? currentVerticalAngle - 360 : currentVerticalAngle;
 
         // Linearly interpolate from xAccumulator/yAccumulator to mouseX/mouseY
-        // Time.deltaTime makes the camera movement frame-rate independent
         xAccumulator = Mathf.Lerp(xAccumulator, mouseX, snappiness * Time.deltaTime);
-        yAccumulator = Mathf.Lerp(yAccumulator, mouseY, snappiness * Time.deltaTime) * CalculateMultiple(currentVerticalAngle);
+
+        // Apply the vertical camera movement multiple if the vertical angle <= -75 degrees or >= 75 degrees
+        if (currentVerticalAngle >= 75 || currentVerticalAngle <= -75)
+            yAccumulator = Mathf.Lerp(yAccumulator, mouseY, snappiness * Time.deltaTime) * CalculateMultiple(currentVerticalAngle);
+        else
+            yAccumulator = Mathf.Lerp(yAccumulator, mouseY, snappiness * Time.deltaTime);
 
         transform.Rotate(0, xAccumulator, 0, Space.World); // Rotate the player itself
         Camera.main.transform.Rotate(-yAccumulator, 0, 0); // Rotate the camera
@@ -36,10 +40,10 @@ public class PlayerController : MonoBehaviour
     {
         // Find the absolute value so that negative angles can be inputted (reflect the graph in the Y-axis)
         verticalAngle = Mathf.Abs(verticalAngle);
+        float power = -0.299999998254f * (verticalAngle - 75);
 
-        // Mathf.Exp returns e raised to the given power (which is -0.05 * verticalAngle, where
-        // verticalAngle is the X-value of the function f(x) = 1.011233793e^(-0.05x) - 0.011233793f
-        return 1.011233793f * Mathf.Exp(-0.05f * verticalAngle) - 0.011233793f;
+        // Mathf.Exp returns e raised to the given power
+        return 1.011233793f * Mathf.Exp(power) - 0.011233793f;
     }
 }
 
